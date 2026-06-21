@@ -89,7 +89,7 @@ function updateToolbarIcon(tabId) {
     });
     setFlagIcon(tabId, main.countryCode.toLowerCase());
   } else {
-    browser.browserAction.setTitle({ tabId, title: "Geo Flags — resolving…" });
+    browser.browserAction.setTitle({ tabId, title: "Geo Flags - No Data" });
     setFlagIcon(tabId, null);
   }
 }
