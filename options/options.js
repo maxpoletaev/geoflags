@@ -5,6 +5,7 @@ const dbStatus = document.getElementById("db-status");
 const dbMissing = document.getElementById("db-missing");
 const dbLastUpdated = document.getElementById("db-last-updated");
 const dbRecordCount = document.getElementById("db-record-count");
+const dbSize = document.getElementById("db-size");
 const testIp = document.getElementById("test-ip");
 const lookupBtn = document.getElementById("lookup-btn");
 const lookupResult = document.getElementById("lookup-result");
@@ -24,6 +25,9 @@ async function loadDBStatus() {
       : "unknown";
     dbRecordCount.textContent = resp.nodeCount
       ? resp.nodeCount.toLocaleString()
+      : "-";
+    dbSize.textContent = resp.dbSize
+      ? (resp.dbSize / 1024 / 1024).toFixed(1) + " MB"
       : "-";
   } else {
     dbStatus.classList.add("hidden");

@@ -1,23 +1,73 @@
-const DB_KEY = "mmdb_v1";
+const IDB_NAME = "geoflags";
+const IDB_VERSION = 1;
+const IDB_STORE = "mmdb";
+const IDB_RECORD = "mmdb";
+
+const LOCALSTORAGE_DB_KEY = "mmdb_v1";
 
 let mmdbReader = null;
 const textDecoder = new TextDecoder();
 
-function bufferToBase64(buffer) {
-  const bytes = new Uint8Array(buffer);
-  let str = "";
-  const chunk = 1024;
-  for (let i = 0; i < bytes.length; i += chunk) {
-    str += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
-  }
-  return btoa(str);
+function idbOpen() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(IDB_NAME, IDB_VERSION);
+    req.onupgradeneeded = () => {
+      const db = req.result;
+      if (!db.objectStoreNames.contains(IDB_STORE)) {
+        db.createObjectStore(IDB_STORE);
+      }
+    };
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+    req.onblocked = () => reject(new Error("IndexedDB upgrade blocked"));
+  });
 }
 
-function base64ToBuffer(b64) {
-  const str = atob(b64);
-  const bytes = new Uint8Array(str.length);
-  for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i);
-  return bytes.buffer;
+function idbRun(mode, fn) {
+  return idbOpen().then((db) => new Promise((resolve, reject) => {
+    const tx = db.transaction(IDB_STORE, mode);
+    let result;
+    tx.oncomplete = () => { db.close(); resolve(result); };
+    tx.onerror = () => { db.close(); reject(tx.error); };
+    tx.onabort = () => { db.close(); reject(tx.error); };
+    result = fn(tx.objectStore(IDB_STORE));
+  }));
+}
+
+async function saveDB(buffer) {
+  await idbRun("readwrite", (store) => store.put(new Uint8Array(buffer), IDB_RECORD));
+}
+
+async function loadFromStorage() {
+  const blob = await idbRun("readonly", (store) => {
+    return new Promise((resolve, reject) => {
+      const req = store.get(IDB_RECORD);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  });
+  if (!blob) return null;
+  // Stored as Uint8Array; hand back an ArrayBuffer to match MMDBReader's input.
+  return blob.buffer;
+}
+
+// One-time migration from localStorage (base64) to IndexedDB.
+async function migrateFromLocalStorage() {
+  const result = await browser.storage.local.get(LOCALSTORAGE_DB_KEY);
+  const b64 = result[LOCALSTORAGE_DB_KEY];
+  if (!b64) return;
+  try {
+    const str = atob(b64);
+    const bytes = new Uint8Array(str.length);
+    for (let i = 0; i < str.length; i++) {
+      bytes[i] = str.charCodeAt(i);
+    }
+    await saveDB(bytes.buffer);
+    await browser.storage.local.remove(LOCALSTORAGE_DB_KEY);
+    console.log("[geoflags] Migrated MMDB from localStorage to IndexedDB");
+  } catch (e) {
+    console.error("[geoflags] MMDB migration failed:", e);
+  }
 }
 
 // Maxmind DB format reader and lookup logic.
@@ -243,15 +293,6 @@ function expandIPv6(addr) {
   return out;
 }
 
-async function saveDB(buffer) {
-  await browser.storage.local.set({ [DB_KEY]: bufferToBase64(buffer) });
-}
-
-async function loadFromStorage() {
-  const result = await browser.storage.local.get(DB_KEY);
-  return result[DB_KEY] ? base64ToBuffer(result[DB_KEY]) : null;
-}
-
 let downloadInProgress = false;
 
 async function fetchAndBuildDB() {
@@ -305,6 +346,7 @@ function isDBReady() {
 }
 
 async function initDB() {
+  await migrateFromLocalStorage();
   const buffer = await loadFromStorage();
   if (buffer) {
     try {

@@ -192,6 +192,7 @@ browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         dbReady: isDBReady(),
         dbLastFetch: dbLastFetch || null,
         nodeCount: reader?.nodeCount ?? null,
+        dbSize: reader?.buf?.byteLength ?? null,
         ipVersion: reader?.ipVersion ?? null,
         recordSize: reader?.recordSize ?? null,
         ipv4StartNode: reader?._ipv4StartNode ?? null,
