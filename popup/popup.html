@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Geo Flags</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div id="header">
+    <img id="header-flag" src="../flags/unknown.png" alt="" />
+    <div id="header-text">
+      <div id="header-hostname">Loading…</div>
+      <div id="header-detail"></div>
+    </div>
+    <button id="settings-btn" title="Settings">⚙</button>
+  </div>
+
+  <div id="chart-section">
+    <svg id="donut" viewBox="0 0 120 120" width="120" height="120"></svg>
+    <div id="legend"></div>
+  </div>
+
+  <table id="domain-table">
+    <thead>
+      <tr>
+        <th>Domain</th>
+        <th>IP</th>
+        <th>Reqs</th>
+      </tr>
+    </thead>
+    <tbody id="domain-tbody"></tbody>
+  </table>
+
+  <div id="no-data" class="hidden">No requests recorded yet.</div>
+  <div id="db-warning" class="hidden">⚠ IP database not configured</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

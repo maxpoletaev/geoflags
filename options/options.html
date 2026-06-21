@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Geo Flags — Settings</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div id="page">
+    <h1>Geo Flags Settings</h1>
+
+    <section>
+      <h2>IP Database</h2>
+
+      <div class="field">
+        <label for="url">Database URL</label>
+        <input type="url" id="url" spellcheck="false" />
+        <p class="hint">Direct URL to an MMDB file.</p>
+      </div>
+
+      <div class="actions">
+        <button id="fetch-btn">Update</button>
+      </div>
+
+      <div id="fetch-result" class="hidden"></div>
+
+      <div id="db-status" class="hidden">
+        <div class="db-stat">
+          <span class="db-stat-label">Last updated</span>
+          <span id="db-last-updated" class="db-stat-value">-</span>
+        </div>
+        <div class="db-stat">
+          <span class="db-stat-label">Records</span>
+          <span id="db-record-count" class="db-stat-value">-</span>
+        </div>
+      </div>
+
+      <div id="db-missing" class="hidden">
+        <span class="dot dot-missing"></span>
+        IP database is not loaded. Please provide a valid URL and click "Update".
+      </div>
+    </section>
+
+    <section id="test-section">
+      <h2>Test Lookup</h2>
+
+      <div class="field">
+        <label for="test-ip">IP Address</label>
+        <div class="input-row">
+          <input type="text" id="test-ip" value="8.8.8.8" spellcheck="false" />
+          <button id="lookup-btn">Look up</button>
+        </div>
+      </div>
+
+      <div id="lookup-result" class="hidden"></div>
+    </section>
+  </div>
+
+  <footer>
+    <span>Flag icons from <a href="https://flagpedia.net" target="_blank" rel="noopener">flagpedia.net</a></span>
+    <span><a href="https://github.com/maxpoletaev/geoflags" target="_blank" rel="noopener">Source code on GitHub</a></span>
+  </footer>
+
+  <script src="../background/settings.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+{
+  "manifest_version": 2,
+  "name": "Geo Flags",
+  "version": "1.0.0",
+  "description": "Shows server location info for every domain a webpage contacts",
+  "permissions": [
+    "webRequest",
+    "tabs",
+    "storage",
+    "webNavigation",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "scripts": [
+      "background/db.js",
+      "background/settings.js",
+      "background/geo_cache.js",
+      "background/tab_state.js",
+      "background/background.js"
+    ],
+    "persistent": true
+  },
+  "browser_action": {
+    "default_title": "Geo Flags",
+    "default_popup": "popup/popup.html"
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  }
+}
