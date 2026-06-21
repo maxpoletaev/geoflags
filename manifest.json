@@ -5,7 +5,6 @@
   "description": "Shows server location info for every domain a webpage contacts",
   "permissions": [
     "webRequest",
-    "tabs",
     "storage",
     "webNavigation",
     "http://*/*",
